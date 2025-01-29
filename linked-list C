@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+typedef struct Node {
+    int data;
+    struct Node *next;
+    struct Node *prev;
+} Node;
+
+typedef struct DoublyLinkedList {
+    Node *head;
+} DoublyLinkedList;
+
+DoublyLinkedList* create_list() {
+    DoublyLinkedList *list = (DoublyLinkedList *)malloc(sizeof(DoublyLinkedList));
+    list->head = NULL;
+    return list;
+}
+
+Node* create_node(int data) {
+    Node *new_node = (Node *)malloc(sizeof(Node));
+    new_node->data = data;
+    new_node->next = NULL;
+    new_node->prev = NULL;
+    return new_node;
+}
+
+void append(DoublyLinkedList *list, int data) {
+    Node *new_node = create_node(data);
+    if (list->head == NULL) {
+        list->head = new_node;
+        return;
+    }
+    Node *last = list->head;
+    while (last->next != NULL) {
+        last = last->next;
+    }
+    last->next = new_node;
+    new_node->prev = last;
+}
+
+void print_list(DoublyLinkedList *list) {
+    Node *current = list->head;
+    while (current != NULL) {
+        printf("%d ", current->data);
+        current = current->next;
+    }
+    printf("\n");
+}
+
+void remove_duplicates_sorting(DoublyLinkedList *list) {
+    int data_array[200];
+    int size = 0;
+
+    Node *current = list->head;
+    while (current != NULL) {
+        data_array[size++] = current->data;
+        current = current->next;
+    }
+
+    // Simple bubble sort
+    for (int i = 0; i < size - 1; i++) {
+        for (int j = 0; j < size - 1 - i; j++) {
+            if (data_array[j] > data_array[j + 1]) {
+                int temp = data_array[j];
+                data_array[j] = data_array[j + 1];
+                data_array[j + 1] = temp;
+            }
+        }
+    }
+
+    // Rebuild the linked list, skipping duplicates
+    list->head = NULL;
+    append(list, data_array[0]);
+    for (int i = 1; i < size; i++) {
+        if (data_array[i] != data_array[i - 1]) {
+            append(list, data_array[i]);
+        }
+    }
+}
+
+void remove_duplicates_iterative(DoublyLinkedList *list) {
+    Node *current = list->head;
+    while (current != NULL) {
+        Node *runner = current->next;
+        while (runner != NULL) {
+            if (runner->data == current->data) {
+                // Remove runner node
+                Node *temp = runner->next;
+                if (runner->next != NULL) {
+                    runner->next->prev = runner->prev;
+                }
+                if (runner->prev != NULL) {
+                    runner->prev->next = runner->next;
+                }
+                free(runner);
+                runner = temp;
+            } else {
+                runner = runner->next;
+            }
+        }
+        current = current->next;
+    }
+}
+
+int main() {
+    DoublyLinkedList *dll = create_list();
+    srand(time(0));
+    for (int i = 0; i < 200; i++) {
+        append(dll, rand() % 50);
+    }
+
+    // Print the original list
+    printf("Original List:\n");
+    print_list(dll);
+
+    // Remove duplicates using sorting method
+    remove_duplicates_sorting(dll);
+    printf("List After Removing Duplicates (Sorting):\n");
+    print_list(dll);
+
+    // Generate a new list for iterative method
+    dll = create_list();
+    for (int i = 0; i < 200; i++) {
+        append(dll, rand() % 50);
+    }
+
+    // Remove duplicates using iterative method
+    remove_duplicates_iterative(dll);
+    printf("List After Removing Duplicates (Iterative):\n");
+    print_list(dll);
+
+    return 0;
+}
