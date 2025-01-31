@@ -1,2 +1,2 @@
 # d-nem2
-BU IKINCI DÖNEMINDE ARKADAŞLARIMI YARDIM ETMEK IÇIN HAZIRLANMIŞTIR
+second semester year 1 practices ...
